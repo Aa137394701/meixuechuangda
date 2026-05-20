@@ -1,19 +1,35 @@
 const app = getApp()
 
-// 十二生肖五行属性
-const ZODIAC_WUXING = {
-  rat: { element: 'water', name: '鼠' },
-  ox: { element: 'earth', name: '牛' },
-  tiger: { element: 'wood', name: '虎' },
-  rabbit: { element: 'wood', name: '兔' },
-  dragon: { element: 'earth', name: '龙' },
-  snake: { element: 'fire', name: '蛇' },
-  horse: { element: 'fire', name: '马' },
-  sheep: { element: 'earth', name: '羊' },
-  monkey: { element: 'metal', name: '猴' },
-  rooster: { element: 'metal', name: '鸡' },
-  dog: { element: 'earth', name: '狗' },
-  pig: { element: 'water', name: '猪' }
+// 十二生肖基础信息
+const ZODIAC_BASE = {
+  rat: { name: '鼠', icon: '\u{1F400}' },
+  ox: { name: '牛', icon: '\u{1F402}' },
+  tiger: { name: '虎', icon: '\u{1F405}' },
+  rabbit: { name: '兔', icon: '\u{1F407}' },
+  dragon: { name: '龙', icon: '\u{1F409}' },
+  snake: { name: '蛇', icon: '\u{1F40D}' },
+  horse: { name: '马', icon: '\u{1F40E}' },
+  sheep: { name: '羊', icon: '\u{1F411}' },
+  monkey: { name: '猴', icon: '\u{1F412}' },
+  rooster: { name: '鸡', icon: '\u{1F413}' },
+  dog: { name: '狗', icon: '\u{1F415}' },
+  pig: { name: '猪', icon: '\u{1F416}' }
+}
+
+// 天干五行映射 (甲子纪年法)
+const HEAVENLY_STEMS = ['金', '金', '水', '水', '木', '木', '火', '火', '土', '土']
+
+// 地支对应生肖
+const EARTHLY_BRANCHES = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake',
+                          'horse', 'sheep', 'monkey', 'rooster', 'dog', 'pig']
+
+// 色彩属性基础颜色库
+const WUXING_COLORS = {
+  wood: { hex: '#4CAF50', name: '木', colors: '绿色、青色、翠色' },
+  fire: { hex: '#FF6B6B', name: '火', colors: '红色、粉色、橙色、紫色' },
+  earth: { hex: '#D4A574', name: '土', colors: '黄色、咖啡色、棕色、卡其色' },
+  metal: { hex: '#E8E8E8', name: '金', colors: '白色、银色、杏色、乳白色' },
+  water: { hex: '#4A90E2', name: '水', colors: '黑色、蓝色、深灰色' }
 }
 
 // 色彩互补关系
@@ -34,20 +50,12 @@ const CONTROLLING_CYCLE = {
   metal: 'wood'
 }
 
-// 色彩属性基础颜色库
-const WUXING_COLORS = {
-  wood: { hex: '#4CAF50', name: '木', colors: '绿色、青色、翠色' },
-  fire: { hex: '#FF6B6B', name: '火', colors: '红色、粉色、橙色、紫色' },
-  earth: { hex: '#D4A574', name: '土', colors: '黄色、咖啡色、棕色、卡其色' },
-  metal: { hex: '#E8E8E8', name: '金', colors: '白色、银色、杏色、乳白色' },
-  water: { hex: '#4A90E2', name: '水', colors: '黑色、蓝色、深灰色' }
-}
-
 Page({
   data: {
     formattedDate: '',
     lunarDate: '',
     currentDay: '',
+    showLoading: false,
     zodiacList: []
   },
 
@@ -105,31 +113,17 @@ Page({
 
   // 生成十二生肖今日推荐颜色
   generateZodiacRecommendations(todayWuxing) {
-    const zodiacIcons = {
-      rat: '🐀',
-      ox: '🐂',
-      tiger: '🐅',
-      rabbit: '🐇',
-      dragon: '🐉',
-      snake: '🐍',
-      horse: '🐎',
-      sheep: '🐑',
-      monkey: '🐒',
-      rooster: '🐓',
-      dog: '🐕',
-      pig: '🐖'
-    }
-
     const zodiacList = []
 
-    for (let key in ZODIAC_WUXING) {
-      const zodiac = ZODIAC_WUXING[key]
-      const zodiacElement = zodiac.element
-      const colors = this.calculateZodiacColors(zodiacElement, todayWuxing)
+    for (let key in ZODIAC_BASE) {
+      const zodiac = ZODIAC_BASE[key]
+      // 获取该生肖今年的年份五行
+      const zodiacWuxing = this.getZodiacYearWuxing(key)
+      const colors = this.calculateZodiacColors(zodiacWuxing, todayWuxing)
 
       zodiacList.push({
         name: zodiac.name,
-        icon: zodiacIcons[key],
+        icon: zodiac.icon,
         colors: colors
       })
     }
@@ -137,19 +131,47 @@ Page({
     return zodiacList
   },
 
+  // 根据生肖获取今年对应年份的五行（天干五行）
+  getZodiacYearWuxing(zodiacKey) {
+    const now = new Date()
+    const currentYear = now.getFullYear()
+
+    // 找到该生肖今年的年份
+    const zodiacIndex = EARTHLY_BRANCHES.indexOf(zodiacKey)
+    // 1900年是鼠年（rat），天干为庚（金）
+    const baseYear = 1900
+    const baseZodiacIndex = 0 // 1900年是鼠年
+
+    // 计算该生肖今年的年份
+    let zodiacYear = currentYear
+    const currentZodiacIndex = (currentYear - baseYear) % 12
+    const diff = (zodiacIndex - currentZodiacIndex + 12) % 12
+    zodiacYear = currentYear - diff
+
+    // 计算该年的天干（10年一循环）
+    const stemIndex = (zodiacYear - 4) % 10 // 4年是甲子年开始
+    const stemWuxing = HEAVENLY_STEMS[stemIndex]
+
+    // 天干五行转英文key
+    const wuxingMap = { '金': 'metal', '木': 'wood', '水': 'water', '火': 'fire', '土': 'earth' }
+    return wuxingMap[stemWuxing] || 'metal'
+  },
+
   // 计算生肖今日推荐颜色
-  calculateZodiacColors(zodiacElement, todayWuxing) {
+  calculateZodiacColors(zodiacWuxingKey, todayWuxing) {
     const todayKey = todayWuxing.hex === '#4CAF50' ? 'wood' :
                      todayWuxing.hex === '#FF6B6B' ? 'fire' :
                      todayWuxing.hex === '#D4A574' ? 'earth' :
                      todayWuxing.hex === '#E8E8E8' ? 'metal' : 'water'
 
+    // 生我者（相生）
     const generatingElement = Object.keys(GENERATING_CYCLE).find(key =>
-      GENERATING_CYCLE[key] === zodiacElement
+      GENERATING_CYCLE[key] === zodiacWuxingKey
     )
 
     let recommendedColors = []
 
+    // 如果今日五行生助生肖五行，推荐今日颜色
     if (todayKey === generatingElement) {
       recommendedColors.push(todayWuxing.name === '金' ? '白' :
                             todayWuxing.name === '木' ? '绿' :
@@ -157,13 +179,15 @@ Page({
                             todayWuxing.name === '火' ? '红' : '黄')
     }
 
-    const selfColor = zodiacElement === 'wood' ? '绿' :
-                      zodiacElement === 'fire' ? '红' :
-                      zodiacElement === 'earth' ? '黄' :
-                      zodiacElement === 'metal' ? '白' : '黑'
+    // 本命色（自身五行）
+    const selfColor = zodiacWuxingKey === 'wood' ? '绿' :
+                      zodiacWuxingKey === 'fire' ? '红' :
+                      zodiacWuxingKey === 'earth' ? '黄' :
+                      zodiacWuxingKey === 'metal' ? '白' : '黑'
     recommendedColors.push(selfColor)
 
-    if (todayKey === zodiacElement && !recommendedColors.includes(
+    // 如果今日五行与生肖五行相同，推荐今日颜色
+    if (todayKey === zodiacWuxingKey && !recommendedColors.includes(
       todayWuxing.name === '金' ? '白' :
       todayWuxing.name === '木' ? '绿' :
       todayWuxing.name === '水' ? '黑' :
@@ -175,6 +199,7 @@ Page({
                             todayWuxing.name === '火' ? '红' : '黄')
     }
 
+    // 红色作为百搭色补充
     if (!recommendedColors.includes('红')) {
       recommendedColors.push('红')
     }
@@ -183,18 +208,28 @@ Page({
   },
 
   async goToMyColor() {
-    wx.showLoading({ title: '检查中...' })
-
     try {
       const userInfoResult = await app.getUserInfo()
-      wx.hideLoading()
 
       if (userInfoResult.success && userInfoResult.data.birthday) {
-        await app.checkAndUpdateAestheticData(true)
-        wx.navigateTo({
-          url: '/pages/my-color/my-color'
-        })
+        // 已填写生日，显示自定义加载遮罩
+        this.setData({ showLoading: true })
+
+        try {
+          await app.checkAndUpdateAestheticData(true)
+          this.setData({ showLoading: false })
+          wx.navigateTo({
+            url: '/pages/my-color/my-color'
+          })
+        } catch (err) {
+          this.setData({ showLoading: false })
+          wx.showToast({
+            title: '生成失败，请重试',
+            icon: 'none'
+          })
+        }
       } else {
+        // 未填写生日，提示去"我的"页面设置
         wx.showModal({
           title: '提示',
           content: '您还没有记录生日信息，请先在"我的"页面设置生日获取专属分析',
@@ -210,11 +245,32 @@ Page({
         })
       }
     } catch (err) {
-      wx.hideLoading()
       wx.showToast({
         title: '检查失败，请重试',
         icon: 'none'
       })
+    }
+  },
+
+  cancelLoading() {
+    this.setData({ showLoading: false })
+  },
+
+  // 分享给朋友
+  onShareAppMessage() {
+    return {
+      title: '色彩美学指南 - 今日穿搭推荐',
+      path: '/pages/index/index',
+      imageUrl: ''
+    }
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '色彩美学指南 - 今日穿搭推荐',
+      query: '',
+      imageUrl: ''
     }
   },
 

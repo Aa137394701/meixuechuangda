@@ -34,7 +34,7 @@
       <!-- 次选色系 -->
       <view class="color-item secondary-choice">
         <view class="color-icon" style="background: {{colorGuide.secondary.hex}};">
-          <text class="tshirt"></text>
+          <text class="tshirt">👕</text>
         </view>
         <view class="color-content">
           <text class="color-title">{{colorGuide.secondary.title}}</text>
@@ -45,7 +45,7 @@
       <!-- 一般色系 -->
       <view class="color-item normal-choice">
         <view class="color-icon" style="background: {{colorGuide.normal.hex}};">
-          <text class="tshirt"></text>
+          <text class="tshirt">👕</text>
         </view>
         <view class="color-content">
           <text class="color-title">{{colorGuide.normal.title}}</text>
@@ -117,5 +117,16 @@
   <!-- 底部提示 -->
   <view class="footer-tip">
     <text>衣服以上衣颜色为主，欢迎朋友们一起交流~~~祝我们天天开心呀~~~</text>
+  </view>
+
+  <!-- 自定义加载遮罩 -->
+  <view class="loading-mask" wx:if="{{showLoading}}">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">正在生成推荐</text>
+      <view class="loading-cancel" bindtap="cancelLoading">
+        <text>取消</text>
+      </view>
+    </view>
   </view>
 </view>

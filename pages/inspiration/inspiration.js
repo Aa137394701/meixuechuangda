@@ -32,6 +32,7 @@ Page({
     currentDate: '',
     currentDay: '',
     lunarDate: '',
+    showLoading: false,
     colorGuide: {
       first: { title: '', colors: '', hex: '' },
       secondary: { title: '', colors: '', hex: '' },
@@ -70,18 +71,28 @@ Page({
   },
 
   async goToMyColor() {
-    wx.showLoading({ title: '检查中...' })
-
     try {
       const userInfoResult = await app.getUserInfo()
-      wx.hideLoading()
 
       if (userInfoResult.success && userInfoResult.data.birthday) {
-        await app.checkAndUpdateAestheticData(true)
-        wx.navigateTo({
-          url: '/pages/my-color/my-color'
-        })
+        // 已填写生日，显示自定义加载遮罩
+        this.setData({ showLoading: true })
+
+        try {
+          await app.checkAndUpdateAestheticData(true)
+          this.setData({ showLoading: false })
+          wx.navigateTo({
+            url: '/pages/my-color/my-color'
+          })
+        } catch (err) {
+          this.setData({ showLoading: false })
+          wx.showToast({
+            title: '生成失败，请重试',
+            icon: 'none'
+          })
+        }
       } else {
+        // 未填写生日，提示去"我的"页面设置
         wx.showModal({
           title: '提示',
           content: '您还没有记录生日信息，请先在"我的"页面设置生日获取专属分析',
@@ -97,11 +108,32 @@ Page({
         })
       }
     } catch (err) {
-      wx.hideLoading()
       wx.showToast({
         title: '检查失败，请重试',
         icon: 'none'
       })
+    }
+  },
+
+  cancelLoading() {
+    this.setData({ showLoading: false })
+  },
+
+  // 分享给朋友
+  onShareAppMessage() {
+    return {
+      title: '色彩美学指南 - 今日穿搭推荐',
+      path: '/pages/inspiration/inspiration',
+      imageUrl: ''
+    }
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return {
+      title: '色彩美学指南 - 今日穿搭推荐',
+      query: '',
+      imageUrl: ''
     }
   },
 
@@ -136,24 +168,29 @@ Page({
                      todayWuxing.hex === '#D4A574' ? 'earth' :
                      todayWuxing.hex === '#E8E8E8' ? 'metal' : 'water'
 
-    const generating = GENERATING_CYCLE[todayKey]
-    const controlling = CONTROLLING_CYCLE[todayKey]
-
-    let controlled = ''
-    for (let key in CONTROLLING_CYCLE) {
-      if (CONTROLLING_CYCLE[key] === todayKey) {
-        controlled = key
+    // 找到生今天的元素（次选）
+    let generating = ''
+    for (let key in GENERATING_CYCLE) {
+      if (GENERATING_CYCLE[key] === todayKey) {
+        generating = key
         break
       }
     }
 
+    // 找到今天生的元素（一般）
+    const generated = GENERATING_CYCLE[todayKey]
+
+    // 找到克今天的元素（不建议）
     let controlledBy = ''
     for (let key in CONTROLLING_CYCLE) {
-      if (key === todayKey) {
-        controlledBy = CONTROLLING_CYCLE[key]
+      if (CONTROLLING_CYCLE[key] === todayKey) {
+        controlledBy = key
         break
       }
     }
+
+    // 找到今天克的元素（强烈不建议）
+    const controlling = CONTROLLING_CYCLE[todayKey]
 
     return {
       first: {
@@ -168,8 +205,8 @@ Page({
       },
       normal: {
         title: '一般色系',
-        colors: WUXING_COLORS[controlling].colors,
-        hex: WUXING_COLORS[controlling].hex
+        colors: WUXING_COLORS[generated].colors,
+        hex: WUXING_COLORS[generated].hex
       },
       notRecommended: {
         title: '不建议色系',
@@ -178,8 +215,8 @@ Page({
       },
       stronglyNotRecommended: {
         title: '强烈不建议',
-        colors: WUXING_COLORS[controlled].colors,
-        hex: WUXING_COLORS[controlled].hex
+        colors: WUXING_COLORS[controlling].colors,
+        hex: WUXING_COLORS[controlling].hex
       }
     }
   },

@@ -38,4 +38,15 @@
       </view>
     </view>
   </view>
+
+  <!-- 自定义加载遮罩 -->
+  <view class="loading-mask" wx:if="{{showLoading}}">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">正在生成推荐</text>
+      <view class="loading-cancel" bindtap="cancelLoading">
+        <text>取消</text>
+      </view>
+    </view>
+  </view>
 </view>
