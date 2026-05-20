@@ -39,6 +39,7 @@
   },
   "appid": "wx167d7401333feaf6",
   "projectname": "五行美学指南",
+  "version": "1.0.0",
   "libVersion": "2.25.0",
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
   "condition": {},
