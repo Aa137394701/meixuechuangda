@@ -84,13 +84,13 @@ Page({
       } else {
         wx.showModal({
           title: '提示',
-          content: '您还没有记录生日信息，请先在首页输入生日获取专属分析',
-          confirmText: '去首页',
+          content: '您还没有记录生日信息，请先在"我的"页面设置生日获取专属分析',
+          confirmText: '去设置',
           confirmColor: '#2E58EB',
           success: (res) => {
             if (res.confirm) {
               wx.switchTab({
-                url: '/pages/inspiration/inspiration'
+                url: '/pages/profile/profile'
               })
             }
           }
