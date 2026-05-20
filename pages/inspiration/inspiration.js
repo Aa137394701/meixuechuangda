@@ -38,18 +38,15 @@ Page({
       normal: { title: '', colors: '', hex: '' },
       notRecommended: { title: '', colors: '', hex: '' },
       stronglyNotRecommended: { title: '', colors: '', hex: '' }
-    },
-    hasLoadedData: false
+    }
   },
 
-  async onLoad() {
+  onLoad() {
     this.initDate()
   },
 
   onShow() {
-    if (!this.data.hasLoadedData) {
-      this.initDate()
-    }
+    this.initDate()
   },
 
   initDate() {
@@ -58,18 +55,9 @@ Page({
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const day = String(now.getDate()).padStart(2, '0')
 
+    // 首页仅根据当日五行能量做推荐，不结合用户生日
     const todayWuxing = this.calculateDailyWuxing(now)
-
-    let colorGuide
-    const aestheticData = app.globalData.aestheticData
-
-    if (aestheticData && aestheticData.color_recommendation) {
-      colorGuide = this.buildColorGuideFromAI(aestheticData.color_recommendation)
-    } else if (aestheticData && aestheticData.wuxing_element) {
-      colorGuide = this.generateColorGuide(aestheticData.wuxing_element)
-    } else {
-      colorGuide = this.generateColorGuide(todayWuxing)
-    }
+    const colorGuide = this.generateColorGuide(todayWuxing)
 
     const lunarDate = this.getLunarDate(now)
 
@@ -77,39 +65,8 @@ Page({
       currentDate: `${year}年${month}月`,
       currentDay: day,
       lunarDate: lunarDate,
-      colorGuide: colorGuide,
-      hasLoadedData: true
+      colorGuide: colorGuide
     })
-  },
-
-  buildColorGuideFromAI(colorRecommendation) {
-    return {
-      first: {
-        title: '首选色系',
-        colors: WUXING_COLORS[colorRecommendation.primary_color].colors,
-        hex: WUXING_COLORS[colorRecommendation.primary_color].hex
-      },
-      secondary: {
-        title: '次选色系',
-        colors: WUXING_COLORS[colorRecommendation.secondary_color].colors,
-        hex: WUXING_COLORS[colorRecommendation.secondary_color].hex
-      },
-      normal: {
-        title: '一般色系',
-        colors: WUXING_COLORS[colorRecommendation.normal_color].colors,
-        hex: WUXING_COLORS[colorRecommendation.normal_color].hex
-      },
-      notRecommended: {
-        title: '不建议色系',
-        colors: WUXING_COLORS[colorRecommendation.not_recommended_color].colors,
-        hex: WUXING_COLORS[colorRecommendation.not_recommended_color].hex
-      },
-      stronglyNotRecommended: {
-        title: '强烈不建议',
-        colors: WUXING_COLORS[colorRecommendation.strongly_not_recommended_color].colors,
-        hex: WUXING_COLORS[colorRecommendation.strongly_not_recommended_color].hex
-      }
-    }
   },
 
   async goToMyColor() {
