@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+    "radar-chart": "/components/radar-chart/radar-chart"
+  }
+}

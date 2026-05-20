@@ -1,0 +1,219 @@
+<view class="container">
+  <!-- 顶部装饰背景 -->
+  <view class="top-glow"></view>
+
+  <!-- 内容区 -->
+  <view class="content">
+    <!-- 新用户：显示输入表单 -->
+    <block wx:if="{{showInputForm}}">
+      <!-- 日期信息 -->
+      <view class="date-section">
+        <view class="date-main">
+          <text class="day">{{currentDay}}</text>
+          <view class="date-info">
+            <text class="date-text">{{formattedDate}}</text>
+            <text class="lunar-text">{{lunarDate}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 美学基因定位卡片 -->
+      <view class="bento-card input-card">
+        <view class="card-header">
+          <text class="card-title">美学基因定位</text>
+        </view>
+        <text class="card-desc">算法驱动的专属色彩逻辑</text>
+        <picker mode="date" value="{{birthday}}" start="1950-01-01" end="{{maxDate}}" bindchange="onBirthdayChange">
+          <view class="input-box">
+            <text class="placeholder-text">{{birthday ? birthday : '填写你的出生日期'}}</text>
+            <text class="arrow-icon">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 生成按钮 -->
+      <button class="main-btn" bindtap="submitBirthday" loading="{{loading}}" disabled="{{loading || !birthday}}">
+        <text class="sparkle">✨</text>
+        <text>{{loading ? '生成中...' : '生成今日穿搭建议'}}</text>
+      </button>
+    </block>
+
+    <!-- 老用户：显示个人看板 -->
+    <block wx:else>
+      <!-- 模块1：核心识别（主色调） -->
+      <view class="bento-card primary-color-card">
+        <text class="primary-label">今日您的主色调</text>
+        <view class="primary-color-display">
+          <view class="color-dot" style="background: {{primaryColor.hex}};"></view>
+          <text class="color-name">{{primaryColor.name}}</text>
+        </view>
+        <text class="date-display">{{formattedDate}} {{lunarDate}}</text>
+      </view>
+
+      <!-- 模块2：色彩推荐色块组 -->
+      <view class="bento-card color-palette-card">
+        <view class="card-header">
+          <text class="section-title">您的今日色彩美学推荐</text>
+        </view>
+
+        <!-- 首选色系 -->
+        <view class="color-palette-item">
+          <view class="palette-header">
+            <view class="palette-icon" style="background: {{colorGuide.first.hex}};">
+              <view class="css-tshirt">
+                <view class="tshirt-collar"></view>
+                <view class="tshirt-body"></view>
+                <view class="tshirt-sleeve-l"></view>
+                <view class="tshirt-sleeve-r"></view>
+              </view>
+            </view>
+            <text class="palette-title">{{colorGuide.first.title}}</text>
+          </view>
+          <view class="palette-colors">
+            <view class="color-block" style="background: {{colorGuide.first.hex}};"></view>
+            <text class="palette-desc">{{colorGuide.first.colors}}</text>
+          </view>
+        </view>
+
+        <!-- 次选色系 -->
+        <view class="color-palette-item">
+          <view class="palette-header">
+            <view class="palette-icon" style="background: {{colorGuide.secondary.hex}};">
+              <view class="css-tshirt">
+                <view class="tshirt-collar"></view>
+                <view class="tshirt-body"></view>
+                <view class="tshirt-sleeve-l"></view>
+                <view class="tshirt-sleeve-r"></view>
+              </view>
+            </view>
+            <text class="palette-title">{{colorGuide.secondary.title}}</text>
+          </view>
+          <view class="palette-colors">
+            <view class="color-block" style="background: {{colorGuide.secondary.hex}};"></view>
+            <text class="palette-desc">{{colorGuide.secondary.colors}}</text>
+          </view>
+        </view>
+
+        <!-- 一般色系 -->
+        <view class="color-palette-item">
+          <view class="palette-header">
+            <view class="palette-icon" style="background: {{colorGuide.normal.hex}};">
+              <view class="css-tshirt">
+                <view class="tshirt-collar"></view>
+                <view class="tshirt-body"></view>
+                <view class="tshirt-sleeve-l"></view>
+                <view class="tshirt-sleeve-r"></view>
+              </view>
+            </view>
+            <text class="palette-title">{{colorGuide.normal.title}}</text>
+          </view>
+          <view class="palette-colors">
+            <view class="color-block" style="background: {{colorGuide.normal.hex}};"></view>
+            <text class="palette-desc">{{colorGuide.normal.colors}}</text>
+          </view>
+        </view>
+
+        <!-- 不建议色系 -->
+        <view class="color-palette-item">
+          <view class="palette-header">
+            <view class="palette-icon" style="background: {{colorGuide.notRecommended.hex}};">
+              <view class="css-tshirt">
+                <view class="tshirt-collar"></view>
+                <view class="tshirt-body"></view>
+                <view class="tshirt-sleeve-l"></view>
+                <view class="tshirt-sleeve-r"></view>
+              </view>
+            </view>
+            <text class="palette-title">{{colorGuide.notRecommended.title}}</text>
+          </view>
+          <view class="palette-colors">
+            <view class="color-block" style="background: {{colorGuide.notRecommended.hex}};"></view>
+            <text class="palette-desc">{{colorGuide.notRecommended.colors}}</text>
+          </view>
+        </view>
+
+        <!-- 强烈不建议 -->
+        <view class="color-palette-item">
+          <view class="palette-header">
+            <view class="palette-icon" style="background: {{colorGuide.stronglyNotRecommended.hex}};">
+              <view class="css-tshirt">
+                <view class="tshirt-collar"></view>
+                <view class="tshirt-body"></view>
+                <view class="tshirt-sleeve-l"></view>
+                <view class="tshirt-sleeve-r"></view>
+              </view>
+            </view>
+            <text class="palette-title">{{colorGuide.stronglyNotRecommended.title}}</text>
+          </view>
+          <view class="palette-colors">
+            <view class="color-block" style="background: {{colorGuide.stronglyNotRecommended.hex}};"></view>
+            <text class="palette-desc">{{colorGuide.stronglyNotRecommended.colors}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 模块3：雷达图（视觉维度分析） -->
+      <view class="bento-card radar-card">
+        <view class="card-header">
+          <text class="section-title">您的视觉维度分析</text>
+        </view>
+        <view class="radar-section">
+          <radar-chart 
+            energyValues="{{energyValues}}" 
+            summary="{{aestheticsSummary}}"
+          />
+        </view>
+      </view>
+
+      <!-- 模块4：穿搭关键词 -->
+      <view class="bento-card keywords-card" wx:if="{{aiAdvice && aiAdvice.clothing_items}}">
+        <view class="card-header">
+          <text class="section-title">穿搭关键词</text>
+        </view>
+        <view class="tag-group">
+          <view class="tag" wx:for="{{aiAdvice.clothing_items}}" wx:key="*this">
+            <text>{{item}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 模块5：风格建议 -->
+      <view class="bento-card style-card" wx:if="{{aiAdvice && aiAdvice.style_advice}}">
+        <view class="card-header">
+          <text class="section-title">风格建议</text>
+        </view>
+        <text class="advice-text">{{aiAdvice.style_advice}}</text>
+      </view>
+
+      <!-- 模块6：香氛建议 -->
+      <view class="bento-card fragrance-card" wx:if="{{aiAdvice && aiAdvice.fragrance_note}}">
+        <view class="card-header">
+          <text class="section-title">香氛建议</text>
+        </view>
+        <text class="advice-text">{{aiAdvice.fragrance_note}}</text>
+      </view>
+
+      <!-- 模块7：色彩美学解析 -->
+      <view class="bento-card analysis-card" wx:if="{{wuxingAnalysis}}">
+        <view class="card-header">
+          <text class="section-title">色彩美学解析</text>
+        </view>
+        <view class="analysis-content">
+          <text class="analysis-text">{{wuxingAnalysis}}</text>
+        </view>
+      </view>
+
+      <!-- 重新生成按钮 -->
+      <button class="main-btn regenerate-btn" bindtap="regenerate" loading="{{loading}}">
+        <text class="sparkle">🔄</text>
+        <text>重新生成</text>
+      </button>
+
+      <!-- 查看我的今日色系推荐按钮 -->
+      <button class="main-btn view-color-btn" bindtap="goToMyColor">
+        <text class="sparkle">✨</text>
+        <text>查看我的今日色系推荐</text>
+      </button>
+    </block>
+  </view>
+</view>

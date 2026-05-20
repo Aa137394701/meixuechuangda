@@ -1,0 +1,146 @@
+<view class="my-color-page">
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <text class="loading-text">正在生成您的专属色系...</text>
+  </view>
+
+  <!-- 未登录状态 -->
+  <view class="not-login-container" wx:elif="{{!hasUserInfo}}">
+    <view class="not-login-content">
+      <text class="not-login-icon"></text>
+      <text class="not-login-title">您还没有记录生日信息</text>
+      <text class="not-login-desc">请先在首页输入生日，获取您的专属色彩美学分析</text>
+      <button class="go-home-btn" bindtap="goToHome">去首页登记</button>
+    </view>
+  </view>
+
+  <!-- 已登录状态 - 显示个人色系推荐 -->
+  <view class="result-container" wx:else>
+    <!-- 用户信息卡片 -->
+    <view class="user-card">
+      <view class="user-avatar" wx:if="{{userInfo.avatarUrl}}">
+        <image class="avatar-img" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      </view>
+      <view class="user-info">
+        <text class="user-name">{{userInfo.nickName || '亲爱的用户'}}</text>
+        <text class="user-birthday">生日：{{userInfo.birthday}}</text>
+      </view>
+    </view>
+
+    <!-- 今日您的主色调 -->
+    <view class="today-wuxing-card">
+      <view class="wuxing-header">
+        <text class="wuxing-label">今日您的主色调</text>
+        <text class="wuxing-value" style="color: {{primaryColor.hex}};">{{primaryColor.name}}</text>
+      </view>
+      <text class="wuxing-date">{{currentDate}} {{lunarDate}}</text>
+    </view>
+
+    <!-- 个人色彩美学推荐 -->
+    <view class="color-guide-section">
+      <view class="section-title">
+        <text class="section-number">01</text>
+        <text class="section-name">您的今日色彩美学推荐</text>
+      </view>
+
+      <view class="color-guide">
+        <!-- 首选色系 -->
+        <view class="color-item first-choice">
+          <view class="color-icon" style="background: {{colorGuide.first.hex}};">
+            <text class="tshirt">👕</text>
+          </view>
+          <view class="color-content">
+            <text class="color-title">{{colorGuide.first.title}}</text>
+            <text class="color-desc">{{colorGuide.first.colors}}</text>
+          </view>
+        </view>
+
+        <!-- 次选色系 -->
+        <view class="color-item secondary-choice">
+          <view class="color-icon" style="background: {{colorGuide.secondary.hex}};">
+            <text class="tshirt">👕</text>
+          </view>
+          <view class="color-content">
+            <text class="color-title">{{colorGuide.secondary.title}}</text>
+            <text class="color-desc">{{colorGuide.secondary.colors}}</text>
+          </view>
+        </view>
+
+        <!-- 一般色系 -->
+        <view class="color-item normal-choice">
+          <view class="color-icon" style="background: {{colorGuide.normal.hex}};">
+            <text class="tshirt">👕</text>
+          </view>
+          <view class="color-content">
+            <text class="color-title">{{colorGuide.normal.title}}</text>
+            <text class="color-desc">{{colorGuide.normal.colors}}</text>
+          </view>
+        </view>
+
+        <!-- 不建议色系 -->
+        <view class="color-item not-recommended">
+          <view class="color-icon" style="background: {{colorGuide.notRecommended.hex}};">
+            <text class="tshirt">👕</text>
+          </view>
+          <view class="color-content">
+            <text class="color-title">{{colorGuide.notRecommended.title}}</text>
+            <text class="color-desc">{{colorGuide.notRecommended.colors}}</text>
+          </view>
+        </view>
+
+        <!-- 强烈不建议色系 -->
+        <view class="color-item strongly-not-recommended">
+          <view class="color-icon" style="background: {{colorGuide.stronglyNotRecommended.hex}};">
+            <text class="tshirt">👕</text>
+          </view>
+          <view class="color-content">
+            <text class="color-title">{{colorGuide.stronglyNotRecommended.title}}</text>
+            <text class="color-desc">{{colorGuide.stronglyNotRecommended.colors}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 视觉维度分析 -->
+    <view class="wuxing-analysis-section">
+      <view class="section-title">
+        <text class="section-number">02</text>
+        <text class="section-name">您的视觉维度分析</text>
+      </view>
+
+      <view class="radar-container">
+        <radar-chart 
+          wx:if="{{energyValues}}"
+          energyValues="{{energyValues}}"
+          missingWuxing="{{missingWuxing}}"
+        ></radar-chart>
+      </view>
+
+      <view class="aesthetics-summary">
+        <text class="summary-text">{{aestheticsSummary}}</text>
+      </view>
+    </view>
+
+    <!-- 色彩美学解析 -->
+    <view class="wuxing-interpretation-section">
+      <view class="section-title">
+        <text class="section-number">03</text>
+        <text class="section-name">色彩美学解析</text>
+      </view>
+
+      <view class="interpretation-card">
+        <view class="interpretation-content">
+          <text class="interpretation-text">{{wuxingAnalysis}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 重新生成按钮 -->
+    <view class="action-buttons">
+      <button class="regenerate-btn" bindtap="regenerate">
+        <text class="btn-icon">🔄</text>
+        <text class="btn-text">重新生成</text>
+      </button>
+    </view>
+  </view>
+</view>

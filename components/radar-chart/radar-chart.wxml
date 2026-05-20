@@ -1,0 +1,14 @@
+<component>
+  <view class="radar-chart-container">
+    <!-- Canvas 雷达图 -->
+    <canvas 
+      type="2d" 
+      class="radar-canvas" 
+      id="radarCanvas"
+      style="width: 400px; height: 400px;"
+    ></canvas>
+    
+    <!-- 总结文案 -->
+    <view class="summary-text">{{summary}}</view>
+  </view>
+</component>
