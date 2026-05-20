@@ -9,4 +9,130 @@
       </view>
     </view>
   </view>
+
+  <!-- 色彩美学推荐 -->
+  <view class="wuxing-section">
+    <view class="section-header">
+      <view class="section-title">
+        <text class="section-number">01</text>
+        <text class="section-name">今日色彩美学推荐</text>
+      </view>
+    </view>
+
+    <view class="color-guide">
+      <!-- 首选色系 -->
+      <view class="color-item first-choice">
+        <view class="color-icon" style="background: {{colorGuide.first.hex}};">
+          <text class="tshirt">👕</text>
+        </view>
+        <view class="color-content">
+          <text class="color-title">{{colorGuide.first.title}}</text>
+          <text class="color-desc">{{colorGuide.first.colors}}</text>
+        </view>
+      </view>
+
+      <!-- 次选色系 -->
+      <view class="color-item secondary-choice">
+        <view class="color-icon" style="background: {{colorGuide.secondary.hex}};">
+          <text class="tshirt">👕</text>
+        </view>
+        <view class="color-content">
+          <text class="color-title">{{colorGuide.secondary.title}}</text>
+          <text class="color-desc">{{colorGuide.secondary.colors}}</text>
+        </view>
+      </view>
+
+      <!-- 一般色系 -->
+      <view class="color-item normal-choice">
+        <view class="color-icon" style="background: {{colorGuide.normal.hex}};">
+          <text class="tshirt">👕</text>
+        </view>
+        <view class="color-content">
+          <text class="color-title">{{colorGuide.normal.title}}</text>
+          <text class="color-desc">{{colorGuide.normal.colors}}</text>
+        </view>
+      </view>
+
+      <!-- 不建议色系 -->
+      <view class="color-item not-recommended">
+        <view class="color-icon" style="background: {{colorGuide.notRecommended.hex}};">
+          <text class="tshirt">👕</text>
+        </view>
+        <view class="color-content">
+          <text class="color-title">{{colorGuide.notRecommended.title}}</text>
+          <text class="color-desc">{{colorGuide.notRecommended.colors}}</text>
+        </view>
+      </view>
+
+      <!-- 强烈不建议色系 -->
+      <view class="color-item strongly-not-recommended">
+        <view class="color-icon" style="background: {{colorGuide.stronglyNotRecommended.hex}};">
+          <text class="tshirt">👕</text>
+        </view>
+        <view class="color-content">
+          <text class="color-title">{{colorGuide.stronglyNotRecommended.title}}</text>
+          <text class="color-desc">{{colorGuide.stronglyNotRecommended.colors}}</text>
+        </view>
+      </view>
+
+      <!-- 查看我的色系按钮 -->
+      <view class="my-color-action" bindtap="goToMyColor">
+        <text class="my-color-text">查看我的今日色系推荐</text>
+        <text class="my-color-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日穿搭指南（原十二生肖色系） -->
+  <view class="zodiac-section">
+    <view class="section-title">
+      <text class="section-number">02</text>
+      <text class="section-name">今日穿搭指南</text>
+    </view>
+
+    <view class="zodiac-grid">
+      <view class="zodiac-item" wx:for="{{zodiacList}}" wx:key="name">
+        <view class="zodiac-icon">{{item.icon}}</view>
+        <view class="zodiac-info">
+          <text class="zodiac-colors">{{item.colors}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 颜色说明 -->
+  <view class="color-explain-section">
+    <view class="section-title">
+      <text class="section-number">03</text>
+      <text class="section-name">颜色说明</text>
+    </view>
+
+    <view class="color-explain">
+      <view class="explain-item">
+        <text class="explain-title">红色系指：</text>
+        <text class="explain-desc">红色、粉色、紫色、橙色系</text>
+      </view>
+      <view class="explain-item">
+        <text class="explain-title">黄色系指：</text>
+        <text class="explain-desc">黄色、土色、褐色、棕色、咖啡色系</text>
+      </view>
+      <view class="explain-item">
+        <text class="explain-title">黑色系指：</text>
+        <text class="explain-desc">黑色、灰色、深蓝色系</text>
+      </view>
+      <view class="explain-item">
+        <text class="explain-title">白色系指：</text>
+        <text class="explain-desc">白色、乳白色、银色、浅色、杏白色系</text>
+      </view>
+      <view class="explain-item">
+        <text class="explain-title">绿色系指：</text>
+        <text class="explain-desc">绿色、青色、蓝色、翠绿色系</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="footer-tip">
+    <text>衣服以上衣颜色为主，欢迎朋友们一起交流~~~祝我们天天开心呀~~~</text>
+  </view>
 </view>

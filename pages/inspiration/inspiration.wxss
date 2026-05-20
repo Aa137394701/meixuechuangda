@@ -48,3 +48,273 @@ page {
   font-weight: 600;
   letter-spacing: 2rpx;
 }
+
+.lunar-date {
+  font-size: 24rpx;
+  color: #8B7355;
+  margin-top: 8rpx;
+}
+
+.debug-btn {
+  margin-top: 12rpx;
+  font-size: 20rpx;
+  padding: 8rpx 16rpx;
+  background: #FF9800;
+  color: white;
+  border-radius: 8rpx;
+  width: auto;
+  display: inline-block;
+}
+
+/* 章节标题 */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+  padding-left: 8rpx;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.section-number {
+  display: inline-block;
+  background: linear-gradient(135deg, #D4C4A0 0%, #B8A88A 100%);
+  color: white;
+  font-size: 24rpx;
+  font-weight: 700;
+  padding: 8rpx 16rpx;
+  border-radius: 12rpx;
+}
+
+.section-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #5C4B3A;
+}
+
+/* 我的色系按钮 - 在模块内部 */
+.my-color-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx 32rpx;
+  margin: 24rpx 0rpx 0rpx 0rpx;
+  background: linear-gradient(135deg, rgba(46, 88, 235, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%);
+  border: 2rpx solid rgba(46, 88, 235, 0.3);
+  border-radius: 24rpx;
+  animation: pulse 2s infinite;
+  cursor: pointer;
+}
+
+.my-color-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2E58EB;
+}
+
+.my-color-arrow {
+  font-size: 40rpx;
+  color: #2E58EB;
+  line-height: 1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 6rpx 16rpx rgba(46, 88, 235, 0.35);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 8rpx 20rpx rgba(46, 88, 235, 0.45);
+  }
+}
+
+/* 色彩美学推荐 */
+.wuxing-section {
+  padding: 32rpx;
+  background: white;
+  margin: 24rpx 32rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx rgba(139, 115, 85, 0.08);
+  border: 1rpx solid rgba(221, 196, 143, 0.2);
+}
+
+.color-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.color-item {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  transition: all 0.3s ease;
+}
+
+.color-item.first-choice {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.08) 0%, rgba(255, 107, 107, 0.03) 100%);
+  border-left: 6rpx solid #FF6B6B;
+}
+
+.color-item.secondary-choice {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(76, 175, 80, 0.03) 100%);
+  border-left: 6rpx solid #4CAF50;
+}
+
+.color-item.normal-choice {
+  background: linear-gradient(135deg, rgba(232, 232, 232, 0.08) 0%, rgba(232, 232, 232, 0.03) 100%);
+  border-left: 6rpx solid #E8E8E8;
+}
+
+.color-item.not-recommended {
+  background: linear-gradient(135deg, rgba(74, 85, 104, 0.08) 0%, rgba(74, 85, 104, 0.03) 100%);
+  border-left: 6rpx solid #4A5568;
+}
+
+.color-item.strongly-not-recommended {
+  background: linear-gradient(135deg, rgba(246, 224, 94, 0.15) 0%, rgba(246, 224, 94, 0.05) 100%);
+  border-left: 6rpx solid #F6E05E;
+}
+
+.color-icon {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.tshirt {
+  font-size: 56rpx;
+  filter: drop-shadow(0 2rpx 4rpx rgba(0, 0, 0, 0.15));
+}
+
+.color-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.color-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #5C4B3A;
+}
+
+.color-desc {
+  font-size: 26rpx;
+  color: #8B7355;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+/* 今日穿搭指南（原十二生肖色系） */
+.zodiac-section {
+  padding: 32rpx;
+  background: white;
+  margin: 24rpx 32rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx rgba(139, 115, 85, 0.08);
+  border: 1rpx solid rgba(221, 196, 143, 0.2);
+}
+
+.zodiac-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+
+.zodiac-item {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx;
+  background: linear-gradient(135deg, #FFF8F0 0%, #FFFBF5 100%);
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(221, 196, 143, 0.2);
+}
+
+.zodiac-icon {
+  font-size: 64rpx;
+  line-height: 1;
+}
+
+.zodiac-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.zodiac-colors {
+  font-size: 26rpx;
+  color: #8B7355;
+  font-weight: 600;
+}
+
+/* 颜色说明 */
+.color-explain-section {
+  padding: 32rpx;
+  background: white;
+  margin: 24rpx 32rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 32rpx rgba(139, 115, 85, 0.08);
+  border: 1rpx solid rgba(221, 196, 143, 0.2);
+}
+
+.color-explain {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.explain-item {
+  display: flex;
+  gap: 12rpx;
+  padding: 16rpx;
+  background: #FFF8F0;
+  border-radius: 12rpx;
+  border-left: 4rpx solid #D4C4A0;
+}
+
+.explain-title {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #8B7355;
+  flex-shrink: 0;
+}
+
+.explain-desc {
+  font-size: 24rpx;
+  color: #A09078;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* 底部提示 */
+.footer-tip {
+  padding: 40rpx 32rpx;
+  text-align: center;
+}
+
+.footer-tip text {
+  font-size: 26rpx;
+  color: #A09078;
+  line-height: 1.8;
+  font-style: italic;
+}
