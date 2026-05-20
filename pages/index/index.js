@@ -182,6 +182,42 @@ Page({
     return recommendedColors.join('、')
   },
 
+  async goToMyColor() {
+    wx.showLoading({ title: '检查中...' })
+
+    try {
+      const userInfoResult = await app.getUserInfo()
+      wx.hideLoading()
+
+      if (userInfoResult.success && userInfoResult.data.birthday) {
+        await app.checkAndUpdateAestheticData(true)
+        wx.navigateTo({
+          url: '/pages/my-color/my-color'
+        })
+      } else {
+        wx.showModal({
+          title: '提示',
+          content: '您还没有记录生日信息，请先在首页输入生日获取专属分析',
+          confirmText: '去首页',
+          confirmColor: '#2E58EB',
+          success: (res) => {
+            if (res.confirm) {
+              wx.switchTab({
+                url: '/pages/inspiration/inspiration'
+              })
+            }
+          }
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      wx.showToast({
+        title: '检查失败，请重试',
+        icon: 'none'
+      })
+    }
+  },
+
   getLunarDate(date) {
     const year = date.getFullYear()
     const month = date.getMonth() + 1

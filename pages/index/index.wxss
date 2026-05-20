@@ -139,3 +139,41 @@ page {
   color: #475569;
   font-weight: 600;
 }
+
+/* 我的色系按钮 */
+.my-color-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 20rpx 32rpx;
+  margin-top: 24rpx;
+  background: linear-gradient(135deg, rgba(46, 88, 235, 0.1) 0%, rgba(30, 64, 175, 0.1) 100%);
+  border: 2rpx solid rgba(46, 88, 235, 0.3);
+  border-radius: 24rpx;
+  animation: pulse 2s infinite;
+  cursor: pointer;
+}
+
+.my-color-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2E58EB;
+}
+
+.my-color-arrow {
+  font-size: 40rpx;
+  color: #2E58EB;
+  line-height: 1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 6rpx 16rpx rgba(46, 88, 235, 0.35);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 8rpx 20rpx rgba(46, 88, 235, 0.45);
+  }
+}

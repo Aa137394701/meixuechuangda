@@ -30,6 +30,12 @@
           </view>
         </view>
       </view>
+
+      <!-- 查看我的色系按钮 -->
+      <view class="my-color-action" bindtap="goToMyColor">
+        <text class="my-color-text">查看我的今日色系推荐</text>
+        <text class="my-color-arrow">›</text>
+      </view>
     </view>
   </view>
 </view>

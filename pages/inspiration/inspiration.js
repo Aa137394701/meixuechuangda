@@ -133,7 +133,7 @@ Page({
           success: (res) => {
             if (res.confirm) {
               wx.switchTab({
-                url: '/pages/index/index'
+                url: '/pages/inspiration/inspiration'
               })
             }
           }
