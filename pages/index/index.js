@@ -1,10 +1,54 @@
 const app = getApp()
 
+// 十二生肖五行属性
+const ZODIAC_WUXING = {
+  rat: { element: 'water', name: '鼠' },
+  ox: { element: 'earth', name: '牛' },
+  tiger: { element: 'wood', name: '虎' },
+  rabbit: { element: 'wood', name: '兔' },
+  dragon: { element: 'earth', name: '龙' },
+  snake: { element: 'fire', name: '蛇' },
+  horse: { element: 'fire', name: '马' },
+  sheep: { element: 'earth', name: '羊' },
+  monkey: { element: 'metal', name: '猴' },
+  rooster: { element: 'metal', name: '鸡' },
+  dog: { element: 'earth', name: '狗' },
+  pig: { element: 'water', name: '猪' }
+}
+
+// 色彩互补关系
+const GENERATING_CYCLE = {
+  wood: 'fire',
+  fire: 'earth',
+  earth: 'metal',
+  metal: 'water',
+  water: 'wood'
+}
+
+// 色彩对比关系
+const CONTROLLING_CYCLE = {
+  wood: 'earth',
+  earth: 'water',
+  water: 'fire',
+  fire: 'metal',
+  metal: 'wood'
+}
+
+// 色彩属性基础颜色库
+const WUXING_COLORS = {
+  wood: { hex: '#4CAF50', name: '木', colors: '绿色、青色、翠色' },
+  fire: { hex: '#FF6B6B', name: '火', colors: '红色、粉色、橙色、紫色' },
+  earth: { hex: '#D4A574', name: '土', colors: '黄色、咖啡色、棕色、卡其色' },
+  metal: { hex: '#E8E8E8', name: '金', colors: '白色、银色、杏色、乳白色' },
+  water: { hex: '#4A90E2', name: '水', colors: '黑色、蓝色、深灰色' }
+}
+
 Page({
   data: {
     formattedDate: '',
     lunarDate: '',
-    currentDay: ''
+    currentDay: '',
+    zodiacList: []
   },
 
   onLoad() {
@@ -21,11 +65,121 @@ Page({
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const day = String(now.getDate()).padStart(2, '0')
 
+    const todayWuxing = this.calculateDailyWuxing(now)
+    const zodiacList = this.generateZodiacRecommendations(todayWuxing)
+
     this.setData({
       formattedDate: `${year}年${month}月${day}日`,
       currentDay: day,
-      lunarDate: this.getLunarDate(now)
+      lunarDate: this.getLunarDate(now),
+      zodiacList: zodiacList
     })
+  },
+
+  // 根据日期生成当日主色调（传统干支历法）
+  calculateDailyWuxing(date) {
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const dayWuxing = this.getDayWuxing(year, month, day)
+
+    const wuxingMap = {
+      metal: WUXING_COLORS.metal,
+      wood: WUXING_COLORS.wood,
+      water: WUXING_COLORS.water,
+      fire: WUXING_COLORS.fire,
+      earth: WUXING_COLORS.earth
+    }
+
+    return wuxingMap[dayWuxing] || WUXING_COLORS.metal
+  },
+
+  // 计算日柱五行（简化版干支历法）
+  getDayWuxing(year, month, day) {
+    const baseDate = new Date(1900, 0, 1)
+    const targetDate = new Date(year, month - 1, day)
+    const diffDays = Math.floor((targetDate - baseDate) / (1000 * 60 * 60 * 24))
+    const wuxingElements = ['metal', 'wood', 'water', 'fire', 'earth']
+    return wuxingElements[diffDays % 5]
+  },
+
+  // 生成十二生肖今日推荐颜色
+  generateZodiacRecommendations(todayWuxing) {
+    const zodiacIcons = {
+      rat: '🐀',
+      ox: '🐂',
+      tiger: '🐅',
+      rabbit: '🐇',
+      dragon: '🐉',
+      snake: '🐍',
+      horse: '🐎',
+      sheep: '🐑',
+      monkey: '🐒',
+      rooster: '🐓',
+      dog: '🐕',
+      pig: '🐖'
+    }
+
+    const zodiacList = []
+
+    for (let key in ZODIAC_WUXING) {
+      const zodiac = ZODIAC_WUXING[key]
+      const zodiacElement = zodiac.element
+      const colors = this.calculateZodiacColors(zodiacElement, todayWuxing)
+
+      zodiacList.push({
+        name: zodiac.name,
+        icon: zodiacIcons[key],
+        colors: colors
+      })
+    }
+
+    return zodiacList
+  },
+
+  // 计算生肖今日推荐颜色
+  calculateZodiacColors(zodiacElement, todayWuxing) {
+    const todayKey = todayWuxing.hex === '#4CAF50' ? 'wood' :
+                     todayWuxing.hex === '#FF6B6B' ? 'fire' :
+                     todayWuxing.hex === '#D4A574' ? 'earth' :
+                     todayWuxing.hex === '#E8E8E8' ? 'metal' : 'water'
+
+    const generatingElement = Object.keys(GENERATING_CYCLE).find(key =>
+      GENERATING_CYCLE[key] === zodiacElement
+    )
+
+    let recommendedColors = []
+
+    if (todayKey === generatingElement) {
+      recommendedColors.push(todayWuxing.name === '金' ? '白' :
+                            todayWuxing.name === '木' ? '绿' :
+                            todayWuxing.name === '水' ? '黑' :
+                            todayWuxing.name === '火' ? '红' : '黄')
+    }
+
+    const selfColor = zodiacElement === 'wood' ? '绿' :
+                      zodiacElement === 'fire' ? '红' :
+                      zodiacElement === 'earth' ? '黄' :
+                      zodiacElement === 'metal' ? '白' : '黑'
+    recommendedColors.push(selfColor)
+
+    if (todayKey === zodiacElement && !recommendedColors.includes(
+      todayWuxing.name === '金' ? '白' :
+      todayWuxing.name === '木' ? '绿' :
+      todayWuxing.name === '水' ? '黑' :
+      todayWuxing.name === '火' ? '红' : '黄'
+    )) {
+      recommendedColors.push(todayWuxing.name === '金' ? '白' :
+                            todayWuxing.name === '木' ? '绿' :
+                            todayWuxing.name === '水' ? '黑' :
+                            todayWuxing.name === '火' ? '红' : '黄')
+    }
+
+    if (!recommendedColors.includes('红')) {
+      recommendedColors.push('红')
+    }
+
+    return recommendedColors.join('、')
   },
 
   getLunarDate(date) {

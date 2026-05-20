@@ -34,7 +34,7 @@
       <!-- 次选色系 -->
       <view class="color-item secondary-choice">
         <view class="color-icon" style="background: {{colorGuide.secondary.hex}};">
-          <text class="tshirt">👕</text>
+          <text class="tshirt"></text>
         </view>
         <view class="color-content">
           <text class="color-title">{{colorGuide.secondary.title}}</text>
@@ -45,7 +45,7 @@
       <!-- 一般色系 -->
       <view class="color-item normal-choice">
         <view class="color-icon" style="background: {{colorGuide.normal.hex}};">
-          <text class="tshirt">👕</text>
+          <text class="tshirt"></text>
         </view>
         <view class="color-content">
           <text class="color-title">{{colorGuide.normal.title}}</text>
@@ -83,27 +83,10 @@
     </view>
   </view>
 
-  <!-- 今日穿搭指南（原十二生肖色系） -->
-  <view class="zodiac-section">
-    <view class="section-title">
-      <text class="section-number">02</text>
-      <text class="section-name">今日穿搭指南</text>
-    </view>
-
-    <view class="zodiac-grid">
-      <view class="zodiac-item" wx:for="{{zodiacList}}" wx:key="name">
-        <view class="zodiac-icon">{{item.icon}}</view>
-        <view class="zodiac-info">
-          <text class="zodiac-colors">{{item.colors}}</text>
-        </view>
-      </view>
-    </view>
-  </view>
-
   <!-- 颜色说明 -->
   <view class="color-explain-section">
     <view class="section-title">
-      <text class="section-number">03</text>
+      <text class="section-number">02</text>
       <text class="section-name">颜色说明</text>
     </view>
 

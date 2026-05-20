@@ -14,5 +14,22 @@
         </view>
       </view>
     </view>
+
+    <!-- 今日穿搭指南 -->
+    <view class="zodiac-section">
+      <view class="section-title">
+        <text class="section-number">02</text>
+        <text class="section-name">今日穿搭指南</text>
+      </view>
+
+      <view class="zodiac-grid">
+        <view class="zodiac-item" wx:for="{{zodiacList}}" wx:key="name">
+          <view class="zodiac-icon">{{item.icon}}</view>
+          <view class="zodiac-info">
+            <text class="zodiac-colors">{{item.colors}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </view>

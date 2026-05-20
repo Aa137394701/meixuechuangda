@@ -222,51 +222,6 @@ page {
   word-break: break-all;
 }
 
-/* 今日穿搭指南（原十二生肖色系） */
-.zodiac-section {
-  padding: 32rpx;
-  background: white;
-  margin: 24rpx 32rpx;
-  border-radius: 24rpx;
-  box-shadow: 0 8rpx 32rpx rgba(139, 115, 85, 0.08);
-  border: 1rpx solid rgba(221, 196, 143, 0.2);
-}
-
-.zodiac-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
-}
-
-.zodiac-item {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  padding: 20rpx;
-  background: linear-gradient(135deg, #FFF8F0 0%, #FFFBF5 100%);
-  border-radius: 16rpx;
-  border: 1rpx solid rgba(221, 196, 143, 0.2);
-}
-
-.zodiac-icon {
-  font-size: 64rpx;
-  line-height: 1;
-}
-
-.zodiac-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4rpx;
-  flex: 1;
-  min-width: 0;
-}
-
-.zodiac-colors {
-  font-size: 26rpx;
-  color: #8B7355;
-  font-weight: 600;
-}
-
 /* 颜色说明 */
 .color-explain-section {
   padding: 32rpx;
