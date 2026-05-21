@@ -170,7 +170,7 @@ Page({
   // 关于我们
   handleAbout() {
     wx.showModal({
-      title: '关于色彩美学指南',
+      title: '关于5行穿衣搭配指南',
       content: '基于传统色彩美学理论的每日穿搭建议工具。\n\n通过视觉维度分析，为您提供个性化的色彩搭配方案，帮助您打造更和谐的个人形象。',
       showCancel: false,
       confirmText: '知道了',

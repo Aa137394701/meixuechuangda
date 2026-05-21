@@ -1,14 +1,14 @@
 {
   "pages": [
-    "pages/index/index",
     "pages/inspiration/inspiration",
+    "pages/index/index",
     "pages/my-color/my-color",
     "pages/profile/profile"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#2E58EB",
-    "navigationBarTitleText": "色彩美学指南",
+    "navigationBarTitleText": "5行穿衣搭配指南",
     "navigationBarTextStyle": "white"
   },
   "tabBar": {

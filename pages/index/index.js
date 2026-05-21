@@ -16,8 +16,19 @@ const ZODIAC_BASE = {
   pig: { name: '猪', icon: '\u{1F416}' }
 }
 
-// 天干五行映射 (甲子纪年法)
-const HEAVENLY_STEMS = ['金', '金', '水', '水', '木', '木', '火', '火', '土', '土']
+// 天干详细信息 (甲子纪年法)
+const HEAVENLY_STEMS = [
+  { name: '甲', element: 'wood', color: '绿', yinYang: '阳' },
+  { name: '乙', element: 'wood', color: '青', yinYang: '阴' },
+  { name: '丙', element: 'fire', color: '红', yinYang: '阳' },
+  { name: '丁', element: 'fire', color: '粉', yinYang: '阴' },
+  { name: '戊', element: 'earth', color: '黄', yinYang: '阳' },
+  { name: '己', element: 'earth', color: '棕', yinYang: '阴' },
+  { name: '庚', element: 'metal', color: '白', yinYang: '阳' },
+  { name: '辛', element: 'metal', color: '银', yinYang: '阴' },
+  { name: '壬', element: 'water', color: '黑', yinYang: '阳' },
+  { name: '癸', element: 'water', color: '蓝', yinYang: '阴' }
+]
 
 // 地支对应生肖
 const EARTHLY_BRANCHES = ['rat', 'ox', 'tiger', 'rabbit', 'dragon', 'snake',
@@ -117,9 +128,9 @@ Page({
 
     for (let key in ZODIAC_BASE) {
       const zodiac = ZODIAC_BASE[key]
-      // 获取该生肖今年的年份五行
-      const zodiacWuxing = this.getZodiacYearWuxing(key)
-      const colors = this.calculateZodiacColors(zodiacWuxing, todayWuxing)
+      // 获取该生肖今年的年份天干信息
+      const zodiacStem = this.getZodiacYearStem(key)
+      const colors = this.calculateZodiacColors(zodiacStem, todayWuxing)
 
       zodiacList.push({
         name: zodiac.name,
@@ -131,8 +142,8 @@ Page({
     return zodiacList
   },
 
-  // 根据生肖获取今年对应年份的五行（天干五行）
-  getZodiacYearWuxing(zodiacKey) {
+  // 根据生肖获取今年对应年份的天干信息
+  getZodiacYearStem(zodiacKey) {
     const now = new Date()
     const currentYear = now.getFullYear()
 
@@ -150,58 +161,38 @@ Page({
 
     // 计算该年的天干（10年一循环）
     const stemIndex = (zodiacYear - 4) % 10 // 4年是甲子年开始
-    const stemWuxing = HEAVENLY_STEMS[stemIndex]
-
-    // 天干五行转英文key
-    const wuxingMap = { '金': 'metal', '木': 'wood', '水': 'water', '火': 'fire', '土': 'earth' }
-    return wuxingMap[stemWuxing] || 'metal'
+    return HEAVENLY_STEMS[stemIndex]
   },
 
   // 计算生肖今日推荐颜色
-  calculateZodiacColors(zodiacWuxingKey, todayWuxing) {
+  calculateZodiacColors(zodiacStem, todayWuxing) {
     const todayKey = todayWuxing.hex === '#4CAF50' ? 'wood' :
                      todayWuxing.hex === '#FF6B6B' ? 'fire' :
                      todayWuxing.hex === '#D4A574' ? 'earth' :
                      todayWuxing.hex === '#E8E8E8' ? 'metal' : 'water'
 
-    // 生我者（相生）
-    const generatingElement = Object.keys(GENERATING_CYCLE).find(key =>
-      GENERATING_CYCLE[key] === zodiacWuxingKey
-    )
+    const colorMap = { wood: '绿', fire: '红', earth: '黄', metal: '白', water: '黑' }
 
     let recommendedColors = []
 
-    // 如果今日五行生助生肖五行，推荐今日颜色
-    if (todayKey === generatingElement) {
-      recommendedColors.push(todayWuxing.name === '金' ? '白' :
-                            todayWuxing.name === '木' ? '绿' :
-                            todayWuxing.name === '水' ? '黑' :
-                            todayWuxing.name === '火' ? '红' : '黄')
+    // 1. 本命色（生肖年份天干对应的颜色，如甲=绿、乙=青、丙=红、丁=粉）
+    recommendedColors.push(zodiacStem.color)
+
+    // 2. 今日五行颜色（如果与本命色不同则添加）
+    const todayColor = colorMap[todayKey]
+    if (todayColor !== zodiacStem.color) {
+      recommendedColors.push(todayColor)
     }
 
-    // 本命色（自身五行）
-    const selfColor = zodiacWuxingKey === 'wood' ? '绿' :
-                      zodiacWuxingKey === 'fire' ? '红' :
-                      zodiacWuxingKey === 'earth' ? '黄' :
-                      zodiacWuxingKey === 'metal' ? '白' : '黑'
-    recommendedColors.push(selfColor)
-
-    // 如果今日五行与生肖五行相同，推荐今日颜色
-    if (todayKey === zodiacWuxingKey && !recommendedColors.includes(
-      todayWuxing.name === '金' ? '白' :
-      todayWuxing.name === '木' ? '绿' :
-      todayWuxing.name === '水' ? '黑' :
-      todayWuxing.name === '火' ? '红' : '黄'
-    )) {
-      recommendedColors.push(todayWuxing.name === '金' ? '白' :
-                            todayWuxing.name === '木' ? '绿' :
-                            todayWuxing.name === '水' ? '黑' :
-                            todayWuxing.name === '火' ? '红' : '黄')
-    }
-
-    // 红色作为百搭色补充
-    if (!recommendedColors.includes('红')) {
-      recommendedColors.push('红')
+    // 3. 相生色（生助生肖五行的元素对应的颜色）
+    const generatingElement = Object.keys(GENERATING_CYCLE).find(key =>
+      GENERATING_CYCLE[key] === zodiacStem.element
+    )
+    if (generatingElement) {
+      const genColor = colorMap[generatingElement]
+      if (!recommendedColors.includes(genColor)) {
+        recommendedColors.push(genColor)
+      }
     }
 
     return recommendedColors.join('、')
@@ -259,7 +250,7 @@ Page({
   // 分享给朋友
   onShareAppMessage() {
     return {
-      title: '色彩美学指南 - 今日穿搭推荐',
+      title: '5行穿衣搭配指南 - 今日穿搭推荐',
       path: '/pages/index/index',
       imageUrl: ''
     }
@@ -268,7 +259,7 @@ Page({
   // 分享到朋友圈
   onShareTimeline() {
     return {
-      title: '色彩美学指南 - 今日穿搭推荐',
+      title: '5行穿衣搭配指南 - 今日穿搭推荐',
       query: '',
       imageUrl: ''
     }

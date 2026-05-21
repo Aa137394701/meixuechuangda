@@ -30,7 +30,7 @@ Page({
   },
 
   onLoad() {
-    this.loadUserData()
+    this.checkUserInfo()
   },
 
   onShow() {
@@ -45,19 +45,17 @@ Page({
     try {
       wx.showLoading({ title: '检查中...' })
       
-      const res = await wx.cloud.callFunction({
-        name: 'userManager',
-        data: { action: 'get' }
-      })
+      // 优先使用 app.getUserInfo()，它会先从本地缓存获取
+      const userInfoResult = await app.getUserInfo()
       
       wx.hideLoading()
-      console.log('检查用户信息结果:', res)
+      console.log('检查用户信息结果:', userInfoResult)
       
-      if (res.result && res.result.success && res.result.data && res.result.data.birthday) {
-        console.log('✅ 用户已登录，生日:', res.result.data.birthday)
+      if (userInfoResult.success && userInfoResult.data && userInfoResult.data.birthday) {
+        console.log('✅ 用户已登录，生日:', userInfoResult.data.birthday)
         this.setData({
           hasUserInfo: true,
-          userInfo: res.result.data
+          userInfo: userInfoResult.data
         })
         
         // 加载用户数据
@@ -84,90 +82,211 @@ Page({
     this.setData({ loading: true })
 
     try {
-      // 确保 userInfo 存在
+      // 确保 userInfo 存在，如果不存在则从 app.getUserInfo() 获取
       if (!this.data.userInfo || !this.data.userInfo.birthday) {
-        console.error('用户信息不存在')
-        this.setData({
-          hasUserInfo: false,
-          loading: false
-        })
-        return
+        console.log('本地 userInfo 不存在，尝试从 app.getUserInfo() 获取')
+        const userInfoResult = await app.getUserInfo()
+        if (userInfoResult.success && userInfoResult.data && userInfoResult.data.birthday) {
+          this.setData({
+            hasUserInfo: true,
+            userInfo: userInfoResult.data
+          })
+        } else {
+          console.error('用户信息不存在')
+          this.setData({
+            hasUserInfo: false,
+            loading: false
+          })
+          return
+        }
       }
 
       const now = new Date()
       const year = now.getFullYear()
       const month = String(now.getMonth() + 1).padStart(2, '0')
       const day = String(now.getDate()).padStart(2, '0')
-      const currentDate = `${year}-${month}-${day}`
       
       console.log('=== 开始加载用户数据 ===')
       console.log('用户生日:', this.data.userInfo.birthday)
       
-      // 调用云函数生成个人 OOTD
-      const result = await wx.cloud.callFunction({
-        name: 'generateOOTD',
-        data: {
-          birthday: this.data.userInfo.birthday,
-          currentDate: currentDate
-        }
-      })
-      
-      console.log('云函数返回:', result)
-
-      if (result.result && result.result.success) {
-        const ootdData = result.result.data
-        const missingWuxing = ootdData.wuxing_element || 'water'
-        
-        // 生成视觉维度分布
-        const energyValues = aestheticsUtils.generateEnergyValues(missingWuxing)
-        
-        // 生成视觉维度总结
-        const aestheticsSummary = aestheticsUtils.generateAestheticsSummary(energyValues, missingWuxing)
-        
-        // 使用 AI 基于五运六气的颜色推荐
-        let colorGuide
-        if (ootdData.color_recommendation) {
-          console.log('使用 AI 五运六气颜色推荐:', ootdData.color_recommendation)
-          colorGuide = this.buildColorGuideFromAI(ootdData.color_recommendation)
-        } else {
-          // 备用方案：计算当日五行
-          const todayWuxing = this.calculateDailyWuxing(now)
-          const todayWuxingKey = todayWuxing.name === '木' ? 'wood' : 
-                                 todayWuxing.name === '火' ? 'fire' : 
-                                 todayWuxing.name === '土' ? 'earth' : 
-                                 todayWuxing.name === '金' ? 'metal' : 'water'
-          colorGuide = this.generateCombinedColorGuide(todayWuxingKey, missingWuxing)
-        }
-        
-        // 提取首选色系的第一个颜色作为用户今日主色调
-        const primaryColor = this.extractPrimaryColor(colorGuide.first.colors, colorGuide.first.hex)
-
-        this.setData({
-          currentDate: `${year}年${month}月${day}日`,
-          lunarDate: this.getLunarDate(now),
-          primaryColor: primaryColor,
-          colorGuide: colorGuide,
-          energyValues: energyValues,
-          missingWuxing: missingWuxing,
-          aestheticsSummary: aestheticsSummary,
-          wuxingAnalysis: ootdData.wuxing_analysis || '',
-          loading: false,
-          hasLoadedData: true
-        })
-      } else {
-        throw new Error('生成失败')
-      }
+      // 使用本地计算生成推荐（快速可靠）
+      this.loadLocalFallback(now, year, month, day)
     } catch (error) {
       console.error('加载数据失败:', error)
-      wx.showToast({
-        title: '加载失败，请重试',
-        icon: 'none'
-      })
-      this.setData({
-        loading: false,
-        hasUserInfo: false
-      })
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = String(now.getMonth() + 1).padStart(2, '0')
+      const day = String(now.getDate()).padStart(2, '0')
+      this.loadLocalFallback(now, year, month, day)
     }
+  },
+
+  // 本地备用方案（云函数失败时使用）
+  loadLocalFallback(now, year, month, day) {
+    const birthday = this.data.userInfo.birthday
+    const missingWuxing = this.calculateMissingWuxing(birthday)
+    
+    // 生成视觉维度分布
+    const energyValues = aestheticsUtils.generateEnergyValues(missingWuxing)
+    const aestheticsSummary = aestheticsUtils.generateAestheticsSummary(energyValues, missingWuxing)
+    
+    // 计算当日五行
+    const todayWuxing = this.calculateDailyWuxing(now)
+    const todayWuxingKey = todayWuxing.name === '木' ? 'wood' : 
+                           todayWuxing.name === '火' ? 'fire' : 
+                           todayWuxing.name === '土' ? 'earth' : 
+                           todayWuxing.name === '金' ? 'metal' : 'water'
+    
+    // 使用简化的本地颜色推荐逻辑
+    const colorGuide = this.generateSimpleColorGuide(todayWuxingKey, missingWuxing)
+    const primaryColor = this.extractPrimaryColor(colorGuide.first.colors, colorGuide.first.hex)
+
+    // 生成本地色彩美学解析
+    const wuxingAnalysis = this.generateLocalAnalysis(colorGuide, energyValues)
+
+    this.setData({
+      currentDate: `${year}年${month}月${day}日`,
+      lunarDate: this.getLunarDate(now),
+      primaryColor: primaryColor,
+      colorGuide: colorGuide,
+      energyValues: energyValues,
+      missingWuxing: missingWuxing,
+      aestheticsSummary: aestheticsSummary,
+      wuxingAnalysis: wuxingAnalysis,
+      loading: false,
+      hasLoadedData: true
+    })
+  },
+
+  // 生成本地色彩美学解析文案（基于实际推荐色系和雷达图能量值）
+  generateLocalAnalysis(colorGuide, energyValues) {
+    const WUXING_NAMES = { wood: '木', fire: '火', earth: '土', metal: '金', water: '水' }
+    const WUXING_STYLES = {
+      wood: '自然清新',
+      fire: '热情活力',
+      earth: '沉稳大气',
+      metal: '简约精致',
+      water: '优雅灵动'
+    }
+    const WUXING_HEX_MAP = {
+      '#4CAF50': 'wood',
+      '#FF6B6B': 'fire',
+      '#D4A574': 'earth',
+      '#E8E8E8': 'metal',
+      '#4A90E2': 'water'
+    }
+
+    // 根据色系 hex 找到对应的五行属性
+    const firstElement = WUXING_HEX_MAP[colorGuide.first.hex] || 'earth'
+    const secondaryElement = WUXING_HEX_MAP[colorGuide.secondary.hex] || 'water'
+    const normalElement = WUXING_HEX_MAP[colorGuide.normal.hex] || 'fire'
+    const notRecommendedElement = WUXING_HEX_MAP[colorGuide.notRecommended.hex] || 'earth'
+    const stronglyNotRecommendedElement = WUXING_HEX_MAP[colorGuide.stronglyNotRecommended.hex] || 'water'
+
+    const firstName = WUXING_NAMES[firstElement]
+    const secondaryName = WUXING_NAMES[secondaryElement]
+    const normalName = WUXING_NAMES[normalElement]
+    const notRecommendedName = WUXING_NAMES[notRecommendedElement]
+    const stronglyNotRecommendedName = WUXING_NAMES[stronglyNotRecommendedElement]
+
+    const firstStyle = WUXING_STYLES[firstElement]
+    const secondaryStyle = WUXING_STYLES[secondaryElement]
+
+    // 找出能量最高和最低的元素
+    let maxElement = 'metal', maxVal = 0
+    let minElement = 'metal', minVal = 100
+    Object.keys(energyValues).forEach(key => {
+      if (energyValues[key] > maxVal) { maxVal = energyValues[key]; maxElement = key }
+      if (energyValues[key] < minVal) { minVal = energyValues[key]; minElement = key }
+    })
+    const maxName = WUXING_NAMES[maxElement]
+    const minName = WUXING_NAMES[minElement]
+
+    return `今日首选色系为${colorGuide.first.colors}（${firstName}属性），这些色彩具有${firstStyle}的特质，能够与您今日的能量场形成最佳共振。雷达图显示您的${maxName}属性能量最强（${maxVal}分），${minName}属性相对较弱（${minVal}分），因此以${firstName}属性色彩为主色调，可以有效平衡您的视觉维度分布。
+
+次选色系${colorGuide.secondary.colors}（${secondaryName}属性）作为辅助搭配，具有${secondaryStyle}的气质，能够增强整体造型的层次感。一般色系${colorGuide.normal.colors}（${normalName}属性）可作为点缀使用，为穿搭增添变化。
+
+不建议色系${colorGuide.notRecommended.colors}（${notRecommendedName}属性）和强烈不建议的${colorGuide.stronglyNotRecommended.colors}（${stronglyNotRecommendedName}属性），从色彩互补角度来看，这些色彩与您今日的能量分布不够协调，容易造成视觉上的冲突感，建议尽量避免大面积使用。`
+  },
+
+  // 简化的本地颜色推荐（不依赖复杂逻辑）
+  generateSimpleColorGuide(todayWuxing, missingWuxing) {
+    const WUXING_COLORS = {
+      wood: { hex: '#4CAF50', name: '木', colors: '绿色、青色、翠色' },
+      fire: { hex: '#FF6B6B', name: '火', colors: '红色、粉色、橙色、紫色' },
+      earth: { hex: '#D4A574', name: '土', colors: '黄色、咖啡色、棕色、卡其色' },
+      metal: { hex: '#E8E8E8', name: '金', colors: '白色、银色、杏色、乳白色' },
+      water: { hex: '#4A90E2', name: '水', colors: '黑色、蓝色、深灰色' }
+    }
+
+    // 五行相生：木→火→土→金→水→木
+    const GENERATING = { wood: 'fire', fire: 'earth', earth: 'metal', metal: 'water', water: 'wood' }
+    // 五行相克：木→土→水→火→金→木
+    const CONTROLLING = { wood: 'earth', earth: 'water', water: 'fire', fire: 'metal', metal: 'wood' }
+
+    // 确保 missingWuxing 和 todayWuxing 是有效的
+    const validElements = ['wood', 'fire', 'earth', 'metal', 'water']
+    const safeMissing = validElements.includes(missingWuxing) ? missingWuxing : 'water'
+    const safeToday = validElements.includes(todayWuxing) ? todayWuxing : 'wood'
+
+    // 找到生 missingWuxing 的元素
+    let generatesMissing = ''
+    for (let key in GENERATING) {
+      if (GENERATING[key] === safeMissing) {
+        generatesMissing = key
+        break
+      }
+    }
+    if (!generatesMissing) generatesMissing = 'water'
+
+    // 找到克 safeToday 的元素
+    let controlsToday = ''
+    for (let key in CONTROLLING) {
+      if (CONTROLLING[key] === safeToday) {
+        controlsToday = key
+        break
+      }
+    }
+    if (!controlsToday) controlsToday = 'fire'
+
+    return {
+      first: {
+        title: '首选色系',
+        colors: WUXING_COLORS[safeMissing].colors,
+        hex: WUXING_COLORS[safeMissing].hex
+      },
+      secondary: {
+        title: '次选色系',
+        colors: WUXING_COLORS[safeToday].colors,
+        hex: WUXING_COLORS[safeToday].hex
+      },
+      normal: {
+        title: '一般色系',
+        colors: WUXING_COLORS[generatesMissing].colors,
+        hex: WUXING_COLORS[generatesMissing].hex
+      },
+      notRecommended: {
+        title: '不建议色系',
+        colors: WUXING_COLORS[controlsToday].colors,
+        hex: WUXING_COLORS[controlsToday].hex
+      },
+      stronglyNotRecommended: {
+        title: '强烈不建议',
+        colors: WUXING_COLORS[CONTROLLING[safeMissing]].colors,
+        hex: WUXING_COLORS[CONTROLLING[safeMissing]].hex
+      }
+    }
+  },
+
+  // 计算用户需要补充的五行（本地备用）
+  calculateMissingWuxing(birthday) {
+    const WUXING_ELEMENTS = ['metal', 'wood', 'water', 'fire', 'earth']
+    const baseDate = new Date(2000, 0, 1)
+    const birthDate = new Date(birthday)
+    const diffDays = Math.floor((birthDate - baseDate) / (1000 * 60 * 60 * 24))
+    // 处理负数取模
+    const index = ((diffDays % 5) + 5) % 5
+    return WUXING_ELEMENTS[index]
   },
 
   // 重新生成

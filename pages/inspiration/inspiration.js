@@ -122,7 +122,7 @@ Page({
   // 分享给朋友
   onShareAppMessage() {
     return {
-      title: '色彩美学指南 - 今日穿搭推荐',
+      title: '5行穿衣搭配指南 - 今日穿搭推荐',
       path: '/pages/inspiration/inspiration',
       imageUrl: ''
     }
@@ -131,7 +131,7 @@ Page({
   // 分享到朋友圈
   onShareTimeline() {
     return {
-      title: '色彩美学指南 - 今日穿搭推荐',
+      title: '5行穿衣搭配指南 - 今日穿搭推荐',
       query: '',
       imageUrl: ''
     }

@@ -77,9 +77,9 @@ Component({
         this.drawPentagon(ctx, centerX, centerY, r, index === 0)
       })
 
-      // 绘制中心轴线
+      // 绘制中心轴线（顺时针方向，与标签位置一致）
       for (let i = 0; i < 5; i++) {
-        const angle = (Math.PI / 2) + (i * 2 * Math.PI / 5)
+        const angle = (Math.PI / 2) - (i * 2 * Math.PI / 5)
         const x = centerX + radius * Math.cos(angle)
         const y = centerY - radius * Math.sin(angle)
         
@@ -91,14 +91,14 @@ Component({
         ctx.stroke()
       }
 
-      // 计算数据点
+      // 计算数据点（顺时针方向，与标签位置一致）
       const dataPoints = []
       const valueLabels = []
       
       elements.forEach((element, index) => {
         const value = this.data.energyValues[element] || 70
         const ratio = Math.max(0.1, value / 100)
-        const angle = (Math.PI / 2) + (index * 2 * Math.PI / 5)
+        const angle = (Math.PI / 2) - (index * 2 * Math.PI / 5)
         
         const r = radius * ratio
         const x = centerX + r * Math.cos(angle)
